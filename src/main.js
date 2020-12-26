@@ -9,12 +9,17 @@ import Vant from 'vant';
 import 'vant/lib/index.css';
 Vue.use(Vant);
 
-Vue.prototype.$imgUrl = "http://localhost:3000"
+// 声明一个全局线上图片地址，后期可跟随线上地址的改变而更改
+Vue.prototype.$imgUrl = "http://localhost:3000";
+
+// 引入状态管理层的vuex
+import store from './store/index';
 
 /* eslint-disable no-new */
 new Vue({
   el: '#app',
   router,
   components: { App },
-  template: '<App/>'
+  template: '<App/>',
+  store
 })

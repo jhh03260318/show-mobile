@@ -21,7 +21,12 @@
           :thumb="$imgUrl + item.img"
         >
           <template #footer>
-            <van-button type="primary" size="small" icon="cart-o"></van-button>
+            <van-button
+              type="primary"
+              size="small"
+              icon="cart-o"
+              @click="getgoods(item.id)"
+            ></van-button>
           </template>
         </van-card>
       </van-tab>
@@ -57,24 +62,35 @@
 
 <script>
 import { BannerList, GooodsList } from "../utils/request";
+import { mapActions } from "vuex";
 export default {
   data() {
     return {
       active: 0,
       bannerList: [], //轮播图列表
-      goodslist: [{content:""},{content:""},{content:""}] //商品信息
+      goodslist: [{ content: "" }, { content: "" }, { content: "" }] //商品信息
     };
   },
   methods: {
+    // 轮播图列表
     banner() {
       BannerList().then(data => {
         this.bannerList = data.list;
       });
     },
+    // 商品分类，热门，推荐，所有
     goods() {
       GooodsList().then(data => {
         this.goodslist = data.list;
       });
+    },
+    ...mapActions({
+      getGoods: "goods/GoodsOneAction"
+    }),
+    // 获取商品的详细信息
+    getgoods(id) {
+      this.getGoods(id);
+      this.$router.push("/detail");
     }
   },
   mounted() {

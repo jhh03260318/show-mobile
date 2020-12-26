@@ -4,22 +4,35 @@
     <!-- 导航栏 -->
     <van-nav-bar left-arrow title="购物车" @click-left="$router.go(-1)" />
     <div v-if="shopcar">
-      <van-card
+      <van-swipe-cell
         v-for="(item, index) in shopcar"
         :key="item.id"
-        :price="item.price"
-        :title="item.goodsname"
-        :thumb="$imgUrl + item.img"
+        name="index"
       >
-        <template #footer>
-          <van-stepper
-            v-model="shopcar[index].num"
-            theme="round"
-            button-size="22"
-            disable-input
+        <van-card
+          :price="item.price"
+          :title="item.goodsname"
+          :thumb="$imgUrl + item.img"
+        >
+          <template #footer>
+            <van-stepper
+              v-model="shopcar[index].num"
+              theme="round"
+              button-size="22"
+              disable-input
+            />
+          </template>
+        </van-card>
+        <template #right>
+          <van-button
+            square
+            text="删除"
+            type="danger"
+            class="delete-button"
+            @click="delCar(item.id)"
           />
         </template>
-      </van-card>
+      </van-swipe-cell>
     </div>
     <!-- 当没有数据时 -->
     <van-empty
@@ -33,7 +46,7 @@
 </template>
 
 <script>
-import { ShopCar } from "../utils/request";
+import { ShopCar, DeleterGoodsByOne } from "../utils/request";
 export default {
   data() {
     return {
@@ -42,6 +55,7 @@ export default {
     };
   },
   methods: {
+    // 购物车列表
     ShopCars() {
       const user = JSON.parse(localStorage.getItem("user"));
       ShopCar({ uid: user.uid }).then(data => {
@@ -49,6 +63,28 @@ export default {
           this.shopcar = data.list;
         }
       });
+    },
+    // 删除购物车
+    delCar(id) {
+      this.$dialog
+        .confirm({
+          title: "友情提示",
+          message: "确定删除吗？"
+        })
+        .then(() => {
+          DeleterGoodsByOne({ id }).then(data => {
+            if (data.code === 200) {
+              this.$toast.success(data.msg);
+              // 删除成功之后重新加载一下数据
+              this.ShopCars();
+            } else {
+              this.$toast.fail(data.msg);
+            }
+          });
+        })
+        .catch(() => {
+          this.$toast.fail("已取消删除");
+        });
     }
   },
   computed: {
@@ -72,5 +108,8 @@ export default {
 }
 .submitorder {
   bottom: 50px;
+}
+.delete-button {
+  height: 100%;
 }
 </style>
